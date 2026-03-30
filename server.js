@@ -24,7 +24,7 @@ app.use(helmet());
 
 
 app.use(cors({
-  origin: "http://localhost:5173", // change to frontend URL in prod
+  origin: "https://dish-dash-kappa.vercel.app", // change to frontend URL in prod
   credentials: true
 }));
 
