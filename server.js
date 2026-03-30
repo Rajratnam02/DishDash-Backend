@@ -33,7 +33,7 @@ app.use(helmet());
 // ✅ CORS (allow frontend)
 app.use(cors({
   origin: [
-    "https://dish-dash-kappa.vercel.app",
+    "https://dish-dash-recipe.vercel.app",
     "http://localhost:5173" // for local dev
   ],
   credentials: true
