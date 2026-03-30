@@ -13,34 +13,52 @@ dotenv.config();
 const app = express();
 
 
+// ✅ FIX 1: TRUST PROXY (VERY IMPORTANT for Vercel/Render)
+app.set("trust proxy", 1);
+
+
+// ✅ DB CONNECTION
 await connectDb();
 
 
+// ✅ BODY PARSING
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 
+// ✅ SECURITY
 app.use(helmet());
 
 
+// ✅ CORS (allow frontend)
 app.use(cors({
-  origin: "https://dish-dash-kappa.vercel.app", // change to frontend URL in prod
+  origin: [
+    "https://dish-dash-kappa.vercel.app",
+    "http://localhost:5173" // for local dev
+  ],
   credentials: true
 }));
 
 
+// ✅ LOGGER
 app.use(morgan("dev"));
 
 
+// ✅ FIX 2: RATE LIMITER (safe config)
 const limiter = rateLimit({
-  windowMs: 15 * 60 * 1000, 
-  max: 100, 
+  windowMs: 15 * 60 * 1000,
+  max: 100,
+  standardHeaders: true,
+  legacyHeaders: false,
 });
 app.use(limiter);
 
 
+// ✅ ROUTES
 app.use("/api", apiRoutes);
 
+
+// ✅ HEALTH CHECK
 app.get("/", (req, res) => {
   res.status(200).json({
     message: "API is running 🚀"
@@ -48,13 +66,16 @@ app.get("/", (req, res) => {
 });
 
 
-app.use((req, res, next) => {
+// ✅ 404 HANDLER
+app.use((req, res) => {
   res.status(404).json({
     success: false,
     message: "Route not found"
   });
 });
 
+
+// ✅ GLOBAL ERROR HANDLER
 app.use((err, req, res, next) => {
   console.error("ERROR:", err);
 
@@ -65,6 +86,7 @@ app.use((err, req, res, next) => {
 });
 
 
+// ✅ SERVER START
 const PORT = process.env.PORT || 5000;
 
 app.listen(PORT, () => {
